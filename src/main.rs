@@ -17,9 +17,19 @@ impl JParser {
         Self
     }
 
-    pub fn parse(&self, mut json_data: String) -> HashMap<String, JsonData> {
-        json_data.remove(0);
-        json_data.pop();
+    fn parse(&self, mut json_data: String) -> Option<HashMap<String, JsonData>> {
+        match self.parse_obj(&mut json_data) {
+            Some(JsonData::JsonObject(obj)) => Some(obj),
+            _ => None,
+        }
+    }
+
+    fn parse_obj(&self, mut json_data: &str) -> Option<JsonData> {
+        let mut chars = json_data.chars();
+        chars.next();
+        chars.next_back();
+
+        json_data = chars.as_str();
 
         let mut json = HashMap::<String, JsonData>::new();
 
@@ -64,11 +74,15 @@ impl JParser {
                         value = self.parse_array(&value_string);
                     } else {
                         value_string += &end_char.to_string();
-                        value = Some(JsonData::JsonObject(self.parse(value_string)));
+
+                        if let Some(v) = self.parse_obj(&mut value_string) {
+                            value = Some(v);
+                        }
                     }
                 }
                 _ => {
                     let mut value_string = String::new();
+
                     if char != '"' {
                         value_string += &char.to_string();
                     }
@@ -94,12 +108,14 @@ impl JParser {
                 json.insert(key.clone(), v);
                 key.clear();
                 value = None;
-            } else {
-                panic!();
             }
         }
 
-        json
+        if json.len() > 0 {
+            Some(JsonData::JsonObject(json))
+        } else {
+            None
+        }
     }
 
     fn parse_string(&self, value: &str) -> Option<JsonData> {
@@ -134,6 +150,21 @@ impl JParser {
         }
     }
 
+    fn parse_array(&self, value: &str) -> Option<JsonData> {
+        let split_values = value.split(",");
+
+        let mut vec = Vec::new();
+
+        for v in split_values {
+            let tv = v.trim();
+            if let Some(ptv) = self.try_parse(tv) {
+                vec.push(ptv);
+            }
+        }
+
+        Some(JsonData::JsonArray(vec))
+    }
+
     fn try_parse(&self, value: &str) -> Option<JsonData> {
         let mut opt: Option<JsonData> = None;
 
@@ -149,26 +180,13 @@ impl JParser {
             opt = self.parse_int(value);
         }
 
-        if opt.is_none() {
+        if opt.is_none() && value.starts_with("{") && value.ends_with("}") {
+            opt = self.parse_obj(value);
+        } else if opt.is_none() {
             opt = self.parse_string(value);
         }
 
         opt
-    }
-
-    fn parse_array(&self, value: &str) -> Option<JsonData> {
-        let split_values = value.split(",");
-
-        let mut vec = Vec::new();
-
-        for v in split_values {
-            let tv = v.trim();
-            if let Some(ptv) = self.try_parse(tv) {
-                vec.push(ptv);
-            }
-        }
-
-        Some(JsonData::JsonArray(vec))
     }
 }
 
@@ -177,8 +195,9 @@ fn main() {
 
     if let Ok(buf) = buffer {
         let parser = JParser::new();
-        let i = parser.parse(buf);
 
-        println!("{:#?}", i);
+        if let Some(value) = parser.parse(buf) {
+            println!("{:#?}", value);
+        }
     }
 }
