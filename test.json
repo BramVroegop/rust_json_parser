@@ -1,0 +1,14 @@
+{
+    "stringTest": "test",
+    "intTest": 21,
+    "boolTest": true,
+    "nullTest": null,
+    "arrTest": [1, 2, 3, 4],
+    "objTest": {
+        "stringTest": "test",
+        "intTest": 21,
+        "boolTest": true,
+        "nullTest": null,
+        "arrTest": [1, 2, 3, 4]
+    }
+}
