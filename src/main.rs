@@ -94,6 +94,8 @@ impl JParser {
                 json.insert(key.clone(), v);
                 key.clear();
                 value = None;
+            } else {
+                panic!();
             }
         }
 
