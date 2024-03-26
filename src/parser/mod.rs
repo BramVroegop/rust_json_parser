@@ -37,7 +37,6 @@ impl JParser {
 
         let mut key = String::new();
         let mut value: Option<JsonData> = None;
-        let mut escaped = false;
         while let Some(char) = it.next() {
             match char {
                 ' ' | '\r' | '\n' | ':' | ',' => {
@@ -52,7 +51,7 @@ impl JParser {
                         key += &next_char.to_string();
                     }
                 }
-                '[' | '{' if !escaped => {
+                '[' | '{' => {
                     let mut value_string = String::new();
                     let end_char = {
                         if char == '[' {
@@ -65,19 +64,13 @@ impl JParser {
 
                     let mut in_string = false;
                     while let Some(next_char) = it.next() {
-                        if next_char == '\\' {
-                            escaped = true;
-                            continue;
-                        }
-
-                        if next_char == '"' && !escaped {
+                        if next_char == '"' {
                             in_string = !in_string;
                         }
 
                         if next_char == end_char && !in_string {
                             break;
                         }
-                        escaped = false;
                         value_string += &next_char.to_string();
                     }
 
@@ -106,23 +99,16 @@ impl JParser {
                             || next_char == '}'
                             || next_char == '\r'
                             || next_char == '\n')
-                            && !escaped
                             && !in_string
                         {
                             break;
                         }
 
-                        if next_char == '\\' {
-                            escaped = true;
-                            continue;
-                        }
-
-                        if next_char == '"' && !escaped {
+                        if next_char == '"' {
                             in_string = false;
                             continue;
                         }
 
-                        escaped = false;
                         value_string += &next_char.to_string();
                     }
 

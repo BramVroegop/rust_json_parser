@@ -4,7 +4,7 @@
     "boolTest": true,
     "nullTest": null,
     "arrTest": [1, 2, {
-        "strTest": "Hello world!"
+        "strTest": "Hello{ w}orld!"
     }, 4],
     "objTest": {
         "stringTest": "t[e]:st",
