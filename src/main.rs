@@ -7,6 +7,7 @@ fn main() {
         let parser = parser::JParser::new();
 
         if let Some(value) = parser.parse(buf) {
+            println!("{:#?}", value);
             match value.get("stringTest").unwrap() {
                 parser::JsonData::JsonString(str) => {
                     println!("{}", str);
