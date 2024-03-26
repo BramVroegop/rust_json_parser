@@ -1,13 +1,13 @@
 {
-    "stringTest": "test",
+    "stringTest": "te,st",
     "intTest": 21,
     "boolTest": true,
     "nullTest": null,
     "arrTest": [1, 2, {
-        "objTest": "Hello world!"
+        "strTest": "Hello world!"
     }, 4],
     "objTest": {
-        "stringTest": "test",
+        "stringTest": "t[e]:st",
         "intTest": 21,
         "boolTest": true,
         "nullTest": null,
