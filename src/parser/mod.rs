@@ -86,6 +86,7 @@ impl JParser {
                 }
                 _ => {
                     let mut in_string = false;
+                    let mut escaped = false;
                     let mut value_string = String::new();
 
                     if char != '"' {
@@ -104,11 +105,21 @@ impl JParser {
                             break;
                         }
 
-                        if next_char == '"' {
+                        if next_char == '\\' {
+                            escaped = true;
+                            continue;
+                        }
+
+                        if next_char == '"' && !escaped {
                             in_string = false;
                             continue;
                         }
 
+                        if escaped && next_char != '"' {
+                            value_string += &'\\'.to_string();
+                        }
+
+                        escaped = false;
                         value_string += &next_char.to_string();
                     }
 

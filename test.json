@@ -1,5 +1,5 @@
 {
-    "stringTest": "te,st",
+    "stringTest": "t\\e,\"st",
     "intTest": 21,
     "boolTest": true,
     "nullTest": null,
